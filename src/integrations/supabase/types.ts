@@ -14,7 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          total_due: number
+          total_eggs: number
+          total_paid: number
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          total_due?: number
+          total_eggs?: number
+          total_paid?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          total_due?: number
+          total_eggs?: number
+          total_paid?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales: {
+        Row: {
+          created_at: string
+          customer_id: string
+          date: string
+          due_amount: number
+          eggs: number
+          id: string
+          paid_amount: number
+          price_per_egg: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          date?: string
+          due_amount?: number
+          eggs: number
+          id?: string
+          paid_amount?: number
+          price_per_egg: number
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          date?: string
+          due_amount?: number
+          eggs?: number
+          id?: string
+          paid_amount?: number
+          price_per_egg?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
