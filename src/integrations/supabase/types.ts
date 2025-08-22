@@ -24,6 +24,7 @@ export type Database = {
           total_paid: number
           total_spent: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -34,6 +35,7 @@ export type Database = {
           total_paid?: number
           total_spent?: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -44,6 +46,61 @@ export type Database = {
           total_paid?: number
           total_spent?: number
           updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      inventory: {
+        Row: {
+          created_at: string
+          eggs_in_stock: number
+          id: string
+          purchase_date: string
+          purchase_price_per_egg: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          eggs_in_stock?: number
+          id?: string
+          purchase_date?: string
+          purchase_price_per_egg: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          eggs_in_stock?: number
+          id?: string
+          purchase_date?: string
+          purchase_price_per_egg?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -59,6 +116,7 @@ export type Database = {
           price_per_egg: number
           total_amount: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -71,6 +129,7 @@ export type Database = {
           price_per_egg: number
           total_amount: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -83,6 +142,7 @@ export type Database = {
           price_per_egg?: number
           total_amount?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {

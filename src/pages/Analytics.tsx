@@ -53,7 +53,7 @@ const Analytics = () => {
               <span className="text-2xl">💰</span>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${summary.totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">₹{summary.totalRevenue.toFixed(2)}</div>
             </CardContent>
           </Card>
 
@@ -63,7 +63,7 @@ const Analytics = () => {
               <span className="text-2xl">✅</span>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${summary.totalCollected.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-green-600">₹{summary.totalCollected.toFixed(2)}</div>
             </CardContent>
           </Card>
 
@@ -74,7 +74,44 @@ const Analytics = () => {
             </CardHeader>
             <CardContent>
               <div className={`text-2xl font-bold ${summary.totalDue > 0 ? 'text-destructive' : 'text-green-600'}`}>
-                ${summary.totalDue.toFixed(2)}
+                ₹{summary.totalDue.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Profit Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
+              <span className="text-2xl">📉</span>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">₹{summary.totalCost.toFixed(2)}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Profit</CardTitle>
+              <span className="text-2xl">📈</span>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${summary.totalProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                ₹{summary.totalProfit.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Profit Margin</CardTitle>
+              <span className="text-2xl">📊</span>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${summary.profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {summary.profitMargin.toFixed(1)}%
               </div>
             </CardContent>
           </Card>
@@ -148,7 +185,7 @@ const Analytics = () => {
                       dataKey="revenue" 
                       stroke="hsl(var(--destructive))" 
                       strokeWidth={2}
-                      name="Revenue ($)"
+                      name="Revenue (₹)"
                     />
                   </LineChart>
                 </ResponsiveContainer>

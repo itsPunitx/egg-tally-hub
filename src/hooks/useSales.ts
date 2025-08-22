@@ -62,11 +62,15 @@ export const useSales = (customerId?: string) => {
     paid_amount: number;
   }) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const total_amount = saleData.eggs * saleData.price_per_egg;
       const due_amount = total_amount - saleData.paid_amount;
 
       const { error } = await supabase.from("sales").insert([{
         ...saleData,
+        user_id: user.id,
         total_amount,
         due_amount,
       }]);
@@ -75,7 +79,7 @@ export const useSales = (customerId?: string) => {
 
       toast({
         title: "Sale recorded successfully",
-        description: `Added ${saleData.eggs} eggs for $${total_amount.toFixed(2)}`,
+        description: `Added ${saleData.eggs} eggs for ₹${total_amount.toFixed(2)}`,
       });
 
       await fetchSales();

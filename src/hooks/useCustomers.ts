@@ -41,12 +41,16 @@ export const useCustomers = () => {
 
   const getOrCreateCustomer = async (name: string): Promise<string | null> => {
     try {
-      // First try to find existing customer
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // First try to find existing customer for this user
       const { data: existing } = await supabase
         .from("customers")
         .select("id")
         .eq("name", name.trim())
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
 
       if (existing) {
         return existing.id;
@@ -55,7 +59,7 @@ export const useCustomers = () => {
       // Create new customer if not found
       const { data, error } = await supabase
         .from("customers")
-        .insert([{ name: name.trim() }])
+        .insert([{ name: name.trim(), user_id: user.id }])
         .select("id")
         .single();
 

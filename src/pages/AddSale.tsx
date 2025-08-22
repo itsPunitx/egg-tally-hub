@@ -107,7 +107,7 @@ const AddSale = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="pricePerEgg">Price per Egg ($)</Label>
+                  <Label htmlFor="pricePerEgg">Price per Egg (₹)</Label>
                   <Input
                     id="pricePerEgg"
                     type="number"
@@ -124,12 +124,12 @@ const AddSale = () => {
               <div className="space-y-2">
                 <Label>Total Amount</Label>
                 <div className="text-2xl font-bold text-primary">
-                  ${totalAmount}
+                  ₹{totalAmount}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="paidAmount">Paid Amount ($)</Label>
+                <Label htmlFor="paidAmount">Paid Amount (₹)</Label>
                 <Input
                   id="paidAmount"
                   type="number"

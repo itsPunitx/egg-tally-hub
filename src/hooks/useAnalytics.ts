@@ -7,6 +7,9 @@ export interface AnalyticsSummary {
   totalRevenue: number;
   totalCollected: number;
   totalDue: number;
+  totalCost: number;
+  totalProfit: number;
+  profitMargin: number;
 }
 
 export interface CustomerStats {
@@ -27,6 +30,9 @@ export const useAnalytics = () => {
     totalRevenue: 0,
     totalCollected: 0,
     totalDue: 0,
+    totalCost: 0,
+    totalProfit: 0,
+    profitMargin: 0,
   });
   const [customerStats, setCustomerStats] = useState<CustomerStats[]>([]);
   const [dailySales, setDailySales] = useState<DailySales[]>([]);
@@ -49,11 +55,33 @@ export const useAnalytics = () => {
       const totalCollected = summaryData?.reduce((sum, sale) => sum + sale.paid_amount, 0) || 0;
       const totalDue = summaryData?.reduce((sum, sale) => sum + sale.due_amount, 0) || 0;
 
+      // Fetch inventory data for cost calculation
+      const { data: inventoryData, error: inventoryError } = await supabase
+        .from("inventory")
+        .select("eggs_in_stock, purchase_price_per_egg");
+
+      if (inventoryError) throw inventoryError;
+
+      // Calculate average purchase cost
+      const totalInventoryCost = inventoryData?.reduce((sum, item) => 
+        sum + (item.eggs_in_stock * item.purchase_price_per_egg), 0) || 0;
+      const totalInventoryEggs = inventoryData?.reduce((sum, item) => 
+        sum + item.eggs_in_stock, 0) || 0;
+      const avgPurchasePrice = totalInventoryEggs > 0 ? totalInventoryCost / totalInventoryEggs : 0;
+
+      // Calculate profit metrics
+      const totalCost = totalEggsSold * avgPurchasePrice;
+      const totalProfit = totalRevenue - totalCost;
+      const profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+
       setSummary({
         totalEggsSold,
         totalRevenue,
         totalCollected,
         totalDue,
+        totalCost,
+        totalProfit,
+        profitMargin,
       });
 
       // Fetch customer stats
