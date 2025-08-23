@@ -84,6 +84,30 @@ export const useInventory = () => {
     return totalEggs > 0 ? totalCost / totalEggs : 0;
   };
 
+  const getStockStatus = async () => {
+    try {
+      const { data: salesData } = await supabase
+        .from("sales")
+        .select("eggs");
+      
+      const totalStock = getTotalStock();
+      const totalSold = salesData?.reduce((sum, sale) => sum + sale.eggs, 0) || 0;
+      const availableStock = Math.max(0, totalStock - totalSold);
+      
+      return {
+        totalStock,
+        totalSold,
+        availableStock,
+      };
+    } catch (error) {
+      return {
+        totalStock: getTotalStock(),
+        totalSold: 0,
+        availableStock: getTotalStock(),
+      };
+    }
+  };
+
   useEffect(() => {
     fetchInventory();
   }, []);
@@ -95,5 +119,6 @@ export const useInventory = () => {
     addInventory,
     getTotalStock,
     getAveragePurchasePrice,
+    getStockStatus,
   };
 };

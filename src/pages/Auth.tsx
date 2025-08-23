@@ -37,7 +37,6 @@ const Auth = () => {
           data: {
             display_name: displayName,
           },
-          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
@@ -45,7 +44,7 @@ const Auth = () => {
 
       toast({
         title: "Success!",
-        description: "Please check your email to confirm your account",
+        description: "Account created successfully! You can now sign in.",
       });
     } catch (error: any) {
       toast({

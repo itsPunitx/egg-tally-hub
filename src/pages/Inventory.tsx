@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useInventory } from "@/hooks/useInventory";
-import { Loader2, Package, Plus } from "lucide-react";
+import { Loader2, Package, Plus, TrendingDown, TrendingUp } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const Inventory = () => {
-  const { inventory, loading, addInventory, getTotalStock, getAveragePurchasePrice } = useInventory();
+  const { inventory, loading, addInventory, getTotalStock, getAveragePurchasePrice, getStockStatus } = useInventory();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [stockStatus, setStockStatus] = useState({
+    totalStock: 0,
+    totalSold: 0,
+    availableStock: 0,
+  });
   const [formData, setFormData] = useState({
     eggs_in_stock: "",
     purchase_price_per_egg: "",
@@ -35,6 +40,16 @@ const Inventory = () => {
       setIsDialogOpen(false);
     }
   };
+
+  useEffect(() => {
+    const loadStockStatus = async () => {
+      if (!loading) {
+        const status = await getStockStatus();
+        setStockStatus(status);
+      }
+    };
+    loadStockStatus();
+  }, [loading, inventory, getStockStatus]);
 
   if (loading) {
     return (
@@ -68,37 +83,48 @@ const Inventory = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Stock</CardTitle>
-              <span className="text-2xl">🥚</span>
+              <CardTitle className="text-sm font-medium">Total Purchased</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalStock.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">eggs in stock</p>
+              <div className="text-2xl font-bold">{stockStatus.totalStock.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">eggs purchased</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Purchase Price</CardTitle>
+              <CardTitle className="text-sm font-medium">Available Stock</CardTitle>
+              <TrendingUp className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">{stockStatus.availableStock.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">eggs available</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Eggs Sold</CardTitle>
+              <TrendingDown className="h-4 w-4 text-destructive" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stockStatus.totalSold.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">eggs sold</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Avg Purchase Price</CardTitle>
               <span className="text-2xl">💰</span>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">₹{avgPurchasePrice.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">per egg</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Investment</CardTitle>
-              <span className="text-2xl">📊</span>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">₹{(totalStock * avgPurchasePrice).toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground">total cost</p>
             </CardContent>
           </Card>
         </div>

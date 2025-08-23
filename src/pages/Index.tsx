@@ -48,7 +48,7 @@ const Index = () => {
                 <span className="text-lg">💰</span>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${summary.totalRevenue.toFixed(2)}</div>
+                <div className="text-2xl font-bold">₹{summary.totalRevenue.toFixed(2)}</div>
               </CardContent>
             </Card>
 
@@ -68,8 +68,8 @@ const Index = () => {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${summary.totalDue > 0 ? 'text-destructive' : 'text-green-600'}`}>
-                  ${summary.totalDue.toFixed(2)}
+                <div className={`text-2xl font-bold ${summary.totalDue > 0 ? 'text-destructive' : 'text-primary'}`}>
+                  ₹{summary.totalDue.toFixed(2)}
                 </div>
               </CardContent>
             </Card>
@@ -126,12 +126,12 @@ const Index = () => {
                       <div>
                         <div className="font-medium">{customer.name}</div>
                         <div className="text-sm text-muted-foreground">
-                          {customer.total_eggs} eggs • ${customer.total_spent.toFixed(2)}
+                          {customer.total_eggs} eggs • ₹{customer.total_spent.toFixed(2)}
                         </div>
                       </div>
                       {customer.total_due > 0 && (
                         <div className="text-sm text-destructive font-medium">
-                          Due: ${customer.total_due.toFixed(2)}
+                          Due: ₹{customer.total_due.toFixed(2)}
                         </div>
                       )}
                     </div>
