@@ -100,14 +100,14 @@ const CustomerRecords = () => {
                           {customer.total_eggs.toLocaleString()}
                         </TableCell>
                         <TableCell className="text-right">
-                          ${customer.total_spent.toFixed(2)}
+                          ₹{customer.total_spent.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-right">
-                          ${customer.total_paid.toFixed(2)}
+                          ₹{customer.total_paid.toFixed(2)}
                         </TableCell>
                         <TableCell className="text-right">
                           <span className={customer.total_due > 0 ? "text-destructive font-medium" : ""}>
-                            ${customer.total_due.toFixed(2)}
+                            ₹{customer.total_due.toFixed(2)}
                           </span>
                         </TableCell>
                         <TableCell className="text-center">

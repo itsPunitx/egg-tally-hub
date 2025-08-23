@@ -4,17 +4,25 @@ import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useCustomers, Customer } from "@/hooks/useCustomers";
 import { useSales } from "@/hooks/useSales";
+import { usePayments } from "@/hooks/usePayments";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, CreditCard } from "lucide-react";
 
 const CustomerDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { customers } = useCustomers();
+  const { customers, fetchCustomers } = useCustomers();
   const { sales, loading } = useSales(id);
+  const { payments, addPayment } = usePayments(id);
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentNotes, setPaymentNotes] = useState("");
 
   useEffect(() => {
     const foundCustomer = customers.find(c => c.id === id);
@@ -35,6 +43,41 @@ const CustomerDetail = () => {
       fetchCustomer();
     }
   }, [id, customers]);
+
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!customer || !id) return;
+    
+    const amount = parseFloat(paymentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      return;
+    }
+
+    const success = await addPayment({
+      customer_id: id,
+      payment_amount: amount,
+      notes: paymentNotes || undefined,
+    });
+
+    if (success) {
+      setPaymentAmount("");
+      setPaymentNotes("");
+      setIsPaymentDialogOpen(false);
+      // Refresh customer data
+      await fetchCustomers();
+      
+      // Update local customer state
+      const { data } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (data) {
+        setCustomer(data);
+      }
+    }
+  };
 
   if (!id) {
     navigate("/customers");
@@ -102,30 +145,84 @@ const CustomerDetail = () => {
                     <div className="text-sm text-muted-foreground">Total Eggs</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold">${customer.total_spent.toFixed(2)}</div>
+                    <div className="text-2xl font-bold">₹{customer.total_spent.toFixed(2)}</div>
                     <div className="text-sm text-muted-foreground">Total Spent</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">${customer.total_paid.toFixed(2)}</div>
+                    <div className="text-2xl font-bold text-green-600">₹{customer.total_paid.toFixed(2)}</div>
                     <div className="text-sm text-muted-foreground">Total Paid</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className={`text-2xl font-bold ${customer.total_due > 0 ? 'text-destructive' : 'text-green-600'}`}>
-                      ${customer.total_due.toFixed(2)}
+                      ₹{customer.total_due.toFixed(2)}
                     </div>
                     <div className="text-sm text-muted-foreground">Amount Due</div>
                   </div>
                 </div>
+
+                {customer.total_due > 0 && (
+                  <div className="mt-4 flex justify-end">
+                    <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Make Payment
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Record Payment</DialogTitle>
+                          <DialogDescription>
+                            Record a payment against {customer.name}'s outstanding dues of ₹{customer.total_due.toFixed(2)}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handlePayment} className="space-y-4">
+                          <div>
+                            <Label htmlFor="paymentAmount">Payment Amount (₹)</Label>
+                            <Input
+                              id="paymentAmount"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              max={customer.total_due}
+                              value={paymentAmount}
+                              onChange={(e) => setPaymentAmount(e.target.value)}
+                              placeholder="Enter payment amount"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="paymentNotes">Notes (optional)</Label>
+                            <Input
+                              id="paymentNotes"
+                              value={paymentNotes}
+                              onChange={(e) => setPaymentNotes(e.target.value)}
+                              placeholder="Add payment notes"
+                            />
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)}>
+                              Cancel
+                            </Button>
+                            <Button type="submit">
+                              Record Payment
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
                 <CardTitle>Transaction History</CardTitle>
-                <CardDescription>All sales transactions for this customer</CardDescription>
+                <CardDescription>All sales transactions and payments for this customer</CardDescription>
               </CardHeader>
               <CardContent>
-                {sales.length === 0 ? (
+                {sales.length === 0 && payments.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     No transactions found for this customer.
                   </div>
@@ -135,7 +232,7 @@ const CustomerDetail = () => {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Date</TableHead>
-                          <TableHead className="text-right">Eggs</TableHead>
+                          <TableHead className="text-right">Type/Eggs</TableHead>
                           <TableHead className="text-right">Price/Egg</TableHead>
                           <TableHead className="text-right">Total</TableHead>
                           <TableHead className="text-right">Paid</TableHead>
@@ -152,19 +249,35 @@ const CustomerDetail = () => {
                               {sale.eggs}
                             </TableCell>
                             <TableCell className="text-right">
-                              ${sale.price_per_egg.toFixed(2)}
+                              ₹{sale.price_per_egg.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
-                              ${sale.total_amount.toFixed(2)}
+                              ₹{sale.total_amount.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
-                              ${sale.paid_amount.toFixed(2)}
+                              ₹{sale.paid_amount.toFixed(2)}
                             </TableCell>
                             <TableCell className="text-right">
                               <span className={sale.due_amount > 0 ? "text-destructive" : ""}>
-                                ${sale.due_amount.toFixed(2)}
+                                ₹{sale.due_amount.toFixed(2)}
                               </span>
                             </TableCell>
+                          </TableRow>
+                        ))}
+                        {payments.map((payment) => (
+                          <TableRow key={`payment-${payment.id}`} className="bg-green-50 dark:bg-green-900/20">
+                            <TableCell>
+                              {new Date(payment.payment_date).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-right font-medium text-green-600">
+                              Payment
+                            </TableCell>
+                            <TableCell className="text-right">-</TableCell>
+                            <TableCell className="text-right">-</TableCell>
+                            <TableCell className="text-right font-medium text-green-600">
+                              ₹{payment.payment_amount.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right">-</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
