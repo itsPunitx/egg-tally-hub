@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+# 🥚 Egg Sales Tracker (But Not Just for Eggs!)
 
-## Project info
+## 📌 About the Project
+Egg Sales Tracker is a simple and mobile-friendly web app built to make selling (and keeping track of what you’ve sold) super easy.  
 
-**URL**: https://lovable.dev/projects/1320bf62-4a0c-4c43-b656-a7e2cb83b5b8
+It was originally designed for hostel students and small sellers to record **egg sales**, payments, stock, and profits — but hey, you can totally use it for **anything else you sell** too!  
+🍅 Vegetables, 🥛 Milk, 📚 Books, 🎧 Gadgets… you name it.  
 
-## How can I edit this code?
+Every user gets their own private dashboard where they can:
+- Record sales instantly  
+- Track who owes money 👀  
+- Manage your stock/inventory  
+- Get clean analytics on sales, revenue, and profit  
 
-There are several ways of editing your application.
+And yes—it all comes with a sleek **dark theme** for a modern, smooth user experience.  
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1320bf62-4a0c-4c43-b656-a7e2cb83b5b8) and start prompting.
+## ✨ What You Can Do
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🔑 Secure Login
+- Quick sign up and login (no boring email verifications 👌).  
+- Your data stays private, only you can see it.  
+- Profile section with your **Name, Email, and Sign Out** options.  
 
-**Use your preferred IDE**
+### 📝 Easy Sale Entry
+- Add a new sale using a simple form:
+  - Customer Name (pick from a list or add a new one)  
+  - Quantity sold (e.g. Eggs, Milk, Books…)  
+  - Price per item (₹ INR by default, but can be adjusted later)  
+  - Total auto-calculated 💵  
+  - Optionally mark how much was paid  
+- If it’s not fully paid, the system tracks **dues automatically**.  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 👥 Customer Records
+- See all your customers in a nice table with:
+  - Total Items Bought  
+  - Total Spent  
+  - Total Paid  
+  - Pending Balance  
+- Click on any customer to see their full history.  
+- Records update **automatically** whenever you adjust payments.  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 📦 Inventory / Stock Management
+- Add your purchased stock (with cost price).  
+- Track:
+  - Total stock you bought  
+  - How much you’ve sold  
+  - What’s still available  
+- Sales are always synced with stock, so no manual math. ✔️  
 
-Follow these steps:
+### 📊 Analytics Dashboard
+- Quick summary cards show:
+  - Total Sold  
+  - Total Revenue (₹)  
+  - Total Collected  
+  - Total Due (customers still owe)  
+  - Total Profit (Revenue – Cost)  
+- Charts included:
+  - **Bar chart:** Sales per customer  
+  - **Line chart:** Daily/weekly sales & revenue  
+  - **Profit chart:** Quick business health view  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 📤 Data & Control
+- Export sales and customers into CSV/Excel.  
+- Edit or fix mistakes in your entries with ease.  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🎨 Look & Feel
+- Dark theme 🌙 that’s easy on the eyes.  
+- Fixed top navigation for quick access.  
+- Clean card-style design, no clutter.  
+- Removed unnecessary extra branding/logos.  
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 🛠️ Tech Stack (Suggested)
+- **Frontend:** HTML, CSS, JavaScript (or React for a fancier UI)  
+- **Backend:** Node.js / Django / Flask (pick your flavor)  
+- **Database:** SQLite / MySQL / MongoDB  
+- **Charts:** Chart.js / Recharts  
+- **Auth:** Simple session-based login system  
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🚀 Why Use It?
+- Perfect for **hostels, flats, or small shops** tracking daily sales.  
+- Great for learning **how to build full-stack apps**.  
+- Flexible: works not just for **eggs**, but for **any product you sell**.  
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/1320bf62-4a0c-4c43-b656-a7e2cb83b5b8) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 👤 Author
+**Punit Gautam**  
+Built with hostel & small business needs in mind — but flexible enough for everyone!  
