@@ -178,7 +178,7 @@ const CustomerDetail = () => {
                         </DialogHeader>
                         <form onSubmit={handlePayment} className="space-y-4">
                           <div>
-                            <Label htmlFor="paymentAmount">Payment Amount (₹)</Label>
+                            <Label htmlFor="paymentAmount" className="text-foreground">Payment Amount (₹)</Label>
                             <Input
                               id="paymentAmount"
                               type="number"
@@ -189,15 +189,17 @@ const CustomerDetail = () => {
                               onChange={(e) => setPaymentAmount(e.target.value)}
                               placeholder="Enter payment amount"
                               required
+                              className="text-foreground placeholder:text-muted-foreground"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="paymentNotes">Notes (optional)</Label>
+                            <Label htmlFor="paymentNotes" className="text-foreground">Notes (optional)</Label>
                             <Input
                               id="paymentNotes"
                               value={paymentNotes}
                               onChange={(e) => setPaymentNotes(e.target.value)}
                               placeholder="Add payment notes"
+                              className="text-foreground placeholder:text-muted-foreground"
                             />
                           </div>
                           <div className="flex justify-end space-x-2">
