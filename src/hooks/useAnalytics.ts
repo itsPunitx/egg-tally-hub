@@ -24,6 +24,15 @@ export interface DailySales {
   revenue: number;
 }
 
+// Create a global refresh function that can be called from other components
+let globalRefreshAnalytics: (() => Promise<void>) | null = null;
+
+export const refreshAnalytics = () => {
+  if (globalRefreshAnalytics) {
+    return globalRefreshAnalytics();
+  }
+};
+
 export const useAnalytics = () => {
   const [summary, setSummary] = useState<AnalyticsSummary>({
     totalEggsSold: 0,
@@ -46,14 +55,22 @@ export const useAnalytics = () => {
       // Fetch summary stats
       const { data: summaryData, error: summaryError } = await supabase
         .from("sales")
-        .select("eggs, total_amount, paid_amount, due_amount");
+        .select("eggs, total_amount, paid_amount");
 
       if (summaryError) throw summaryError;
 
       const totalEggsSold = summaryData?.reduce((sum, sale) => sum + sale.eggs, 0) || 0;
       const totalRevenue = summaryData?.reduce((sum, sale) => sum + sale.total_amount, 0) || 0;
       const totalCollected = summaryData?.reduce((sum, sale) => sum + sale.paid_amount, 0) || 0;
-      const totalDue = summaryData?.reduce((sum, sale) => sum + sale.due_amount, 0) || 0;
+      
+      // Fetch current total due from customers table (more accurate after payments)
+      const { data: customersData, error: customersError } = await supabase
+        .from("customers")
+        .select("total_due");
+
+      if (customersError) throw customersError;
+      
+      const totalDue = customersData?.reduce((sum, customer) => sum + customer.total_due, 0) || 0;
 
       // Fetch inventory data for cost calculation
       const { data: inventoryData, error: inventoryError } = await supabase
@@ -127,6 +144,13 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     fetchAnalytics();
+    // Set global refresh function
+    globalRefreshAnalytics = fetchAnalytics;
+    
+    // Cleanup
+    return () => {
+      globalRefreshAnalytics = null;
+    };
   }, []);
 
   return {

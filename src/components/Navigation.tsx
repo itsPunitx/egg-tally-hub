@@ -1,13 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Plus, Users, BarChart3, Package, LogOut } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
+import { Home, Plus, Users, BarChart3, Package } from "lucide-react";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 const Navigation = () => {
   const location = useLocation();
-  const { signOut } = useAuth();
-  const { toast } = useToast();
 
   const navItems = [
     { path: "/", label: "Home", icon: Home },
@@ -16,22 +13,6 @@ const Navigation = () => {
     { path: "/inventory", label: "Inventory", icon: Package },
     { path: "/analytics", label: "Analytics", icon: BarChart3 },
   ];
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been logged out",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
 
   return (
     <nav className="bg-card border-b border-border mb-6 shadow-lg">
@@ -57,10 +38,7 @@ const Navigation = () => {
                 </Button>
               );
             })}
-            <Button variant="ghost" onClick={handleSignOut} className="flex items-center gap-2">
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
+            <ProfileDropdown />
           </div>
 
           {/* Mobile menu */}
@@ -81,9 +59,7 @@ const Navigation = () => {
                   </Button>
                 );
               })}
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4" />
-              </Button>
+              <ProfileDropdown />
             </div>
           </div>
         </div>

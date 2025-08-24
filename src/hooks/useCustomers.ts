@@ -13,6 +13,15 @@ export interface Customer {
   updated_at: string;
 }
 
+// Create a global refresh function that can be called from other components
+let globalRefreshCustomers: (() => Promise<void>) | null = null;
+
+export const refreshCustomers = () => {
+  if (globalRefreshCustomers) {
+    return globalRefreshCustomers();
+  }
+};
+
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +90,13 @@ export const useCustomers = () => {
 
   useEffect(() => {
     fetchCustomers();
+    // Set global refresh function
+    globalRefreshCustomers = fetchCustomers;
+    
+    // Cleanup
+    return () => {
+      globalRefreshCustomers = null;
+    };
   }, []);
 
   return {

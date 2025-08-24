@@ -66,6 +66,13 @@ export const usePayments = (customerId?: string) => {
       });
 
       await fetchPayments();
+      
+      // Refresh analytics and customers data after payment
+      const { refreshAnalytics } = await import("@/hooks/useAnalytics");
+      const { refreshCustomers } = await import("@/hooks/useCustomers");
+      refreshAnalytics();
+      refreshCustomers();
+      
       return true;
     } catch (error: any) {
       toast({
