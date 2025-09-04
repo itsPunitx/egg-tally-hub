@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCustomers } from "@/hooks/useCustomers";
 import { useExport } from "@/hooks/useExport";
 import { Loader2, Search, Eye, Download } from "lucide-react";
+import MobileCustomerCard from "@/components/MobileCustomerCard";
 
 const CustomerRecords = () => {
   const { customers, loading } = useCustomers();
@@ -32,15 +33,15 @@ const CustomerRecords = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-background p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         <Navigation />
         
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
                   <span>👥</span>
                   Customer Records
                 </CardTitle>
@@ -52,7 +53,7 @@ const CustomerRecords = () => {
                 onClick={exportCustomers}
                 disabled={isExporting || customers.length === 0}
                 variant="outline"
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto"
               >
                 {isExporting && <Loader2 className="h-4 w-4 animate-spin" />}
                 <Download className="h-4 w-4" />
@@ -78,54 +79,64 @@ const CustomerRecords = () => {
                 {searchQuery ? "No customers found matching your search." : "No customers yet. Add a sale to get started!"}
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer Name</TableHead>
-                      <TableHead className="text-right">Total Eggs</TableHead>
-                      <TableHead className="text-right">Total Spent</TableHead>
-                      <TableHead className="text-right">Total Paid</TableHead>
-                      <TableHead className="text-right">Pending Due</TableHead>
-                      <TableHead className="text-center">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCustomers.map((customer) => (
-                      <TableRow key={customer.id}>
-                        <TableCell className="font-medium">
-                          {customer.name}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {customer.total_eggs.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          ₹{customer.total_spent.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          ₹{customer.total_paid.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <span className={customer.total_due > 0 ? "text-destructive font-medium" : ""}>
-                            ₹{customer.total_due.toFixed(2)}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Button
-                            asChild
-                            variant="ghost"
-                            size="sm"
-                          >
-                            <Link to={`/customer/${customer.id}`}>
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        </TableCell>
+              <>
+                {/* Desktop table */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer Name</TableHead>
+                        <TableHead className="text-right">Total Eggs</TableHead>
+                        <TableHead className="text-right">Total Spent</TableHead>
+                        <TableHead className="text-right">Total Paid</TableHead>
+                        <TableHead className="text-right">Pending Due</TableHead>
+                        <TableHead className="text-center">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomers.map((customer) => (
+                        <TableRow key={customer.id}>
+                          <TableCell className="font-medium">
+                            {customer.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {customer.total_eggs.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ₹{customer.total_spent.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ₹{customer.total_paid.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className={customer.total_due > 0 ? "text-destructive font-medium" : ""}>
+                              ₹{customer.total_due.toFixed(2)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              asChild
+                              variant="ghost"
+                              size="sm"
+                            >
+                              <Link to={`/customer/${customer.id}`}>
+                                <Eye className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="lg:hidden">
+                  {filteredCustomers.map((customer) => (
+                    <MobileCustomerCard key={customer.id} customer={customer} />
+                  ))}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

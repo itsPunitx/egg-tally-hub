@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useInventory } from "@/hooks/useInventory";
 import { Loader2, Package, Plus, TrendingDown, TrendingUp } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import MobileInventoryCard from "@/components/MobileInventoryCard";
 
 const Inventory = () => {
   const { inventory, loading, addInventory, getTotalStock, getAveragePurchasePrice, getStockStatus } = useInventory();
@@ -68,13 +69,13 @@ const Inventory = () => {
   const avgPurchasePrice = getAveragePurchasePrice();
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-background p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         <Navigation />
         
         <div className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Package className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+            <Package className="h-6 w-6 sm:h-8 sm:w-8" />
             Inventory Management
           </h1>
           <p className="text-muted-foreground">
@@ -83,14 +84,14 @@ const Inventory = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Purchased</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stockStatus.totalStock.toLocaleString()}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stockStatus.totalStock.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">eggs purchased</p>
             </CardContent>
           </Card>
@@ -101,7 +102,7 @@ const Inventory = () => {
               <TrendingUp className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">{stockStatus.availableStock.toLocaleString()}</div>
+              <div className="text-xl sm:text-2xl font-bold text-primary">{stockStatus.availableStock.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">eggs available</p>
             </CardContent>
           </Card>
@@ -112,7 +113,7 @@ const Inventory = () => {
               <TrendingDown className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stockStatus.totalSold.toLocaleString()}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stockStatus.totalSold.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">eggs sold</p>
             </CardContent>
           </Card>
@@ -120,10 +121,10 @@ const Inventory = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Avg Purchase Price</CardTitle>
-              <span className="text-2xl">💰</span>
+              <span className="text-xl sm:text-2xl">💰</span>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{avgPurchasePrice.toFixed(2)}</div>
+              <div className="text-xl sm:text-2xl font-bold">₹{avgPurchasePrice.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">per egg</p>
             </CardContent>
           </Card>
@@ -133,12 +134,12 @@ const Inventory = () => {
         <div className="mb-6">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2 w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 Add Stock
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="mx-2">
               <DialogHeader>
                 <DialogTitle>Add New Stock</DialogTitle>
                 <DialogDescription>
@@ -185,7 +186,7 @@ const Inventory = () => {
           </Dialog>
         </div>
 
-        {/* Inventory Table */}
+        {/* Inventory Table/Cards */}
         <Card>
           <CardHeader>
             <CardTitle>Stock Records</CardTitle>
@@ -199,26 +200,38 @@ const Inventory = () => {
                 <p className="text-sm text-muted-foreground">Add your first stock purchase to get started</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Purchase Date</TableHead>
-                    <TableHead>Eggs</TableHead>
-                    <TableHead>Price per Egg</TableHead>
-                    <TableHead>Total Cost</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Purchase Date</TableHead>
+                        <TableHead>Eggs</TableHead>
+                        <TableHead>Price per Egg</TableHead>
+                        <TableHead>Total Cost</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {inventory.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{new Date(item.purchase_date).toLocaleDateString()}</TableCell>
+                          <TableCell>{item.eggs_in_stock.toLocaleString()}</TableCell>
+                          <TableCell>₹{item.purchase_price_per_egg.toFixed(2)}</TableCell>
+                          <TableCell>₹{(item.eggs_in_stock * item.purchase_price_per_egg).toFixed(2)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="md:hidden">
                   {inventory.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{new Date(item.purchase_date).toLocaleDateString()}</TableCell>
-                      <TableCell>{item.eggs_in_stock.toLocaleString()}</TableCell>
-                      <TableCell>₹{item.purchase_price_per_egg.toFixed(2)}</TableCell>
-                      <TableCell>₹{(item.eggs_in_stock * item.purchase_price_per_egg).toFixed(2)}</TableCell>
-                    </TableRow>
+                    <MobileInventoryCard key={item.id} item={item} />
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

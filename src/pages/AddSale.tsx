@@ -59,13 +59,13 @@ const AddSale = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-background p-2 sm:p-4">
       <div className="max-w-2xl mx-auto">
         <Navigation />
         
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
               <span>🥚</span>
               Add New Sale
             </CardTitle>
@@ -123,7 +123,7 @@ const AddSale = () => {
 
               <div className="space-y-2">
                 <Label>Total Amount</Label>
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-xl sm:text-2xl font-bold text-primary">
                   ₹{totalAmount}
                 </div>
               </div>
@@ -145,11 +145,11 @@ const AddSale = () => {
                 </p>
               </div>
 
-              <div className="flex gap-2 pt-4">
+              <div className="flex flex-col sm:flex-row gap-2 pt-4">
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1"
+                  className="flex-1 h-12"
                 >
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Record Sale
@@ -158,6 +158,7 @@ const AddSale = () => {
                   type="button"
                   variant="outline"
                   onClick={() => navigate("/")}
+                  className="h-12"
                 >
                   Cancel
                 </Button>

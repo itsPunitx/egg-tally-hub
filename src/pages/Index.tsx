@@ -15,30 +15,30 @@ const Index = () => {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-background p-2 sm:p-4">
       <div className="max-w-6xl mx-auto">
         <Navigation />
         
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2 flex items-center justify-center gap-2">
+        <div className="mb-4 sm:mb-8 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2 flex items-center justify-center gap-2">
             <span>🥚</span>
             Hostel Egg Sales Tracker
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-lg sm:text-xl text-muted-foreground">
             Manage your egg sales and track payments efficiently
           </p>
         </div>
 
         {/* Quick Stats */}
         {!analyticsLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Eggs Sold Today</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{summary.totalEggsSold}</div>
+                <div className="text-xl sm:text-2xl font-bold">{summary.totalEggsSold}</div>
               </CardContent>
             </Card>
 
@@ -48,7 +48,7 @@ const Index = () => {
                 <span className="text-lg">💰</span>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₹{summary.totalRevenue.toFixed(2)}</div>
+                <div className="text-xl sm:text-2xl font-bold">₹{summary.totalRevenue.toFixed(2)}</div>
               </CardContent>
             </Card>
 
@@ -58,7 +58,7 @@ const Index = () => {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{customers.length}</div>
+                <div className="text-xl sm:text-2xl font-bold">{customers.length}</div>
               </CardContent>
             </Card>
 
@@ -68,7 +68,7 @@ const Index = () => {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className={`text-2xl font-bold ${summary.totalDue > 0 ? 'text-destructive' : 'text-primary'}`}>
+                <div className={`text-xl sm:text-2xl font-bold ${summary.totalDue > 0 ? 'text-destructive' : 'text-primary'}`}>
                   ₹{summary.totalDue.toFixed(2)}
                 </div>
               </CardContent>
@@ -76,7 +76,7 @@ const Index = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Quick Actions */}
           <Card>
             <CardHeader>
@@ -93,7 +93,7 @@ const Index = () => {
                 </Link>
               </Button>
               
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Button asChild variant="outline">
                   <Link to="/customers">View Customers</Link>
                 </Button>
@@ -122,7 +122,7 @@ const Index = () => {
               ) : recentCustomers.length > 0 ? (
                 <div className="space-y-3">
                   {recentCustomers.map((customer) => (
-                    <div key={customer.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div key={customer.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/50 rounded-lg gap-2">
                       <div>
                         <div className="font-medium">{customer.name}</div>
                         <div className="text-sm text-muted-foreground">
