@@ -80,6 +80,39 @@ export type Database = {
         }
         Relationships: []
       }
+      inventory_summary: {
+        Row: {
+          available_stock: number
+          average_purchase_price: number
+          created_at: string
+          id: string
+          total_cost: number
+          total_stock: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_stock?: number
+          average_purchase_price?: number
+          created_at?: string
+          id?: string
+          total_cost?: number
+          total_stock?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_stock?: number
+          average_purchase_price?: number
+          created_at?: string
+          id?: string
+          total_cost?: number
+          total_stock?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           created_at: string
@@ -200,7 +233,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_inventory_summary: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

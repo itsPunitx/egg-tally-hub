@@ -12,22 +12,62 @@ export interface Inventory {
   updated_at: string;
 }
 
+export interface InventorySummary {
+  id: string;
+  user_id: string;
+  total_stock: number;
+  available_stock: number;
+  total_cost: number;
+  average_purchase_price: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export const useInventory = () => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
+  const [inventorySummary, setInventorySummary] = useState<InventorySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
+  const fetchInventorySummary = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("inventory_summary")
+        .select("*")
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // Ignore 'not found' errors
+      setInventorySummary(data || null);
+    } catch (error: any) {
+      console.log("No inventory summary found, will be created on first inventory addition");
+      setInventorySummary(null);
+    }
+  };
+
   const fetchInventory = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("inventory")
-        .select("*")
-        .order("purchase_date", { ascending: false });
+      
+      // Fetch both inventory records and summary in parallel
+      const [inventoryResult, summaryResult] = await Promise.all([
+        supabase
+          .from("inventory")
+          .select("*")
+          .order("purchase_date", { ascending: false }),
+        supabase
+          .from("inventory_summary")
+          .select("*")
+          .single()
+      ]);
 
-      if (error) throw error;
-      setInventory(data || []);
+      if (inventoryResult.error) throw inventoryResult.error;
+      setInventory(inventoryResult.data || []);
+      
+      // Summary might not exist yet, that's okay
+      if (summaryResult.data) {
+        setInventorySummary(summaryResult.data);
+      }
     } catch (error: any) {
       toast({
         title: "Error fetching inventory",
@@ -87,39 +127,40 @@ export const useInventory = () => {
   };
 
   const getTotalStock = () => {
-    return inventory.reduce((total, item) => total + item.eggs_in_stock, 0);
+    // Use stored value from inventory_summary if available, fallback to calculation
+    return inventorySummary?.total_stock ?? inventory.reduce((total, item) => total + item.eggs_in_stock, 0);
   };
 
   const getAveragePurchasePrice = () => {
+    // Use stored value from inventory_summary if available, fallback to calculation
+    if (inventorySummary?.average_purchase_price !== undefined) {
+      return inventorySummary.average_purchase_price;
+    }
+    
     if (inventory.length === 0) return 0;
     const totalCost = inventory.reduce((total, item) => 
       total + (item.eggs_in_stock * item.purchase_price_per_egg), 0);
-    const totalEggs = getTotalStock();
+    const totalEggs = inventory.reduce((total, item) => total + item.eggs_in_stock, 0);
     return totalEggs > 0 ? totalCost / totalEggs : 0;
   };
 
-  const getStockStatus = async () => {
-    try {
-      const { data: salesData } = await supabase
-        .from("sales")
-        .select("eggs");
-      
-      const totalStock = getTotalStock();
-      const totalSold = salesData?.reduce((sum, sale) => sum + sale.eggs, 0) || 0;
-      const availableStock = Math.max(0, totalStock - totalSold);
-      
+  const getStockStatus = () => {
+    // Use stored values from inventory_summary if available
+    if (inventorySummary) {
       return {
-        totalStock,
-        totalSold,
-        availableStock,
-      };
-    } catch (error) {
-      return {
-        totalStock: getTotalStock(),
-        totalSold: 0,
-        availableStock: getTotalStock(),
+        totalStock: inventorySummary.total_stock,
+        totalSold: inventorySummary.total_stock - inventorySummary.available_stock,
+        availableStock: inventorySummary.available_stock,
       };
     }
+    
+    // Fallback to calculation if no summary available
+    const totalStock = inventory.reduce((total, item) => total + item.eggs_in_stock, 0);
+    return {
+      totalStock,
+      totalSold: 0, // Can't calculate without sales data
+      availableStock: totalStock,
+    };
   };
 
   useEffect(() => {
@@ -128,6 +169,7 @@ export const useInventory = () => {
 
   return {
     inventory,
+    inventorySummary,
     loading,
     submitting,
     fetchInventory,

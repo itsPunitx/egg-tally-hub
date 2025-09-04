@@ -43,13 +43,10 @@ const Inventory = () => {
   };
 
   useEffect(() => {
-    const loadStockStatus = async () => {
-      if (!loading) {
-        const status = await getStockStatus();
-        setStockStatus(status);
-      }
-    };
-    loadStockStatus();
+    if (!loading) {
+      const status = getStockStatus();
+      setStockStatus(status);
+    }
   }, [loading, inventory, getStockStatus]);
 
   if (loading) {
