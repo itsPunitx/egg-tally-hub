@@ -15,6 +15,7 @@ export interface Payment {
 export const usePayments = (customerId?: string) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   const fetchPayments = async () => {
@@ -49,9 +50,17 @@ export const usePayments = (customerId?: string) => {
     payment_amount: number;
     notes?: string;
   }) => {
+    if (submitting) return false; // Prevent double submissions
+    
     try {
+      setSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
+
+      // Validate payment amount is positive
+      if (paymentData.payment_amount <= 0) {
+        throw new Error("Payment amount must be greater than 0");
+      }
 
       const { error } = await supabase.from("payments").insert([{
         ...paymentData,
@@ -65,13 +74,8 @@ export const usePayments = (customerId?: string) => {
         description: `Payment of ₹${paymentData.payment_amount.toFixed(2)} has been recorded`,
       });
 
+      // Only refresh payments, let database triggers handle customer totals
       await fetchPayments();
-      
-      // Refresh analytics and customers data after payment
-      const { refreshAnalytics } = await import("@/hooks/useAnalytics");
-      const { refreshCustomers } = await import("@/hooks/useCustomers");
-      refreshAnalytics();
-      refreshCustomers();
       
       return true;
     } catch (error: any) {
@@ -81,6 +85,8 @@ export const usePayments = (customerId?: string) => {
         variant: "destructive",
       });
       return false;
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -91,6 +97,7 @@ export const usePayments = (customerId?: string) => {
   return {
     payments,
     loading,
+    submitting,
     fetchPayments,
     addPayment,
   };

@@ -15,6 +15,7 @@ export interface Inventory {
 export const useInventory = () => {
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   const fetchInventory = async () => {
@@ -43,9 +44,20 @@ export const useInventory = () => {
     purchase_price_per_egg: number;
     purchase_date?: string;
   }) => {
+    if (submitting) return false; // Prevent double submissions
+    
     try {
+      setSubmitting(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
+
+      // Validate inputs
+      if (inventoryData.eggs_in_stock <= 0) {
+        throw new Error("Eggs in stock must be greater than 0");
+      }
+      if (inventoryData.purchase_price_per_egg <= 0) {
+        throw new Error("Purchase price must be greater than 0");
+      }
 
       const { error } = await supabase.from("inventory").insert([{
         ...inventoryData,
@@ -69,6 +81,8 @@ export const useInventory = () => {
         variant: "destructive",
       });
       return false;
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -115,6 +129,7 @@ export const useInventory = () => {
   return {
     inventory,
     loading,
+    submitting,
     fetchInventory,
     addInventory,
     getTotalStock,

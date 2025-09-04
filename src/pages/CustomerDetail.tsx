@@ -12,17 +12,19 @@ import { useSales } from "@/hooks/useSales";
 import { usePayments } from "@/hooks/usePayments";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Loader2, CreditCard } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const CustomerDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { customers, fetchCustomers } = useCustomers();
   const { sales, loading } = useSales(id);
-  const { payments, addPayment } = usePayments(id);
+  const { payments, addPayment, submitting: paymentSubmitting } = usePayments(id);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentNotes, setPaymentNotes] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     const foundCustomer = customers.find(c => c.id === id);
@@ -47,10 +49,25 @@ const CustomerDetail = () => {
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!customer || !id) return;
+    if (!customer || !id || paymentSubmitting) return;
     
     const amount = parseFloat(paymentAmount);
     if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid payment amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Prevent payment exceeding due amount
+    if (amount > customer.total_due) {
+      toast({
+        title: "Payment exceeds due amount",
+        description: `Payment cannot exceed ₹${customer.total_due.toFixed(2)}`,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -64,18 +81,18 @@ const CustomerDetail = () => {
       setPaymentAmount("");
       setPaymentNotes("");
       setIsPaymentDialogOpen(false);
-      // Refresh customer data
-      await fetchCustomers();
-      
-      // Update local customer state
-      const { data } = await supabase
-        .from("customers")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (data) {
-        setCustomer(data);
-      }
+      // Refresh customer data after a brief delay to allow DB triggers to complete
+      setTimeout(async () => {
+        await fetchCustomers();
+        const { data } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (data) {
+          setCustomer(data);
+        }
+      }, 500);
     }
   };
 
@@ -206,8 +223,15 @@ const CustomerDetail = () => {
                             <Button type="button" variant="outline" onClick={() => setIsPaymentDialogOpen(false)}>
                               Cancel
                             </Button>
-                            <Button type="submit">
-                              Record Payment
+                            <Button type="submit" disabled={paymentSubmitting}>
+                              {paymentSubmitting ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  Processing...
+                                </>
+                              ) : (
+                                "Record Payment"
+                              )}
                             </Button>
                           </div>
                         </form>
