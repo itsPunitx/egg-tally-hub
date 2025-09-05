@@ -73,7 +73,7 @@ And yes—it all comes with a sleek **dark theme** for a modern, smooth user exp
 
 ---
 
-## 🛠️ Tech Stack (Suggested)
+## 🛠️ Tech Stack 
 - **Frontend:** HTML, CSS, JavaScript (or React for a fancier UI)  
 - **Backend:** Node.js / Django / Flask (pick your flavor)  
 - **Database:** SQLite / MySQL / MongoDB  
